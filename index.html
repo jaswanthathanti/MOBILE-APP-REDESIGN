@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialFlow - Mobile App Redesign</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 30px;
+            padding: 20px 0;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 15px 15px;
+            z-index: 100;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .app-content {
+            height: calc(100% - 60px);
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            background: #fff;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .screen.prev {
+            transform: translateX(-100%);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            fill: #333;
+        }
+
+        /* Focus Mode Toggle */
+        .focus-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 25px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: rgba(255,255,255,0.6);
+        }
+
+        .toggle-knob {
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(25px);
+        }
+
+        /* Content Cards */
+        .content-grid {
+            padding: 0 20px 20px;
+        }
+
+        .content-card {
+            background: #fff;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .card-content {
+            padding: 15px;
+        }
+
+        .card-content p {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #f0f8ff;
+            color: #667eea;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .action-btn:hover {
+            color: #667eea;
+        }
+
+        /* Interest Filters */
+        .interest-filters {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .filter-chip {
+            background: #f0f0f0;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .filter-chip.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Explanation Panel */
+        .explanation-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .explanation-panel.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .explanation-panel h2 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .explanation-panel h3 {
+            color: #667eea;
+            margin: 20px 0 10px;
+            font-size: 18px;
+        }
+
+        .explanation-panel p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .explanation-panel ul {
+            margin: 10px 0 20px 20px;
+            color: #666;
+        }
+
+        .explanation-panel li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Screen Controls */
+        .screen-controls {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            background: #5a6fd8;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-container {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .explanation-panel {
+                max-width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="phone-notch"></div>
+        
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>●●●○○</span>
+            <span>100%</span>
+        </div>
+
+        <div class="app-content">
+            <!-- Home Screen -->
+            <div class="screen active" id="homeScreen">
+                <div class="header">
+                    <h1>SocialFlow</h1>
+                    <svg class="header-icon" onclick="showExplanation()" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <path d="M12 17h.01"/>
+                    </svg>
+                </div>
+
+                <div class="focus-toggle">
+                    <div class="toggle-switch" id="focusToggle" onclick="toggleFocusMode()">
+                        <div class="toggle-knob"></div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">Focus Mode</div>
+                        <div style="font-size: 12px; opacity: 0.8;">Curated content based on your interests</div>
+                    </div>
+                </div>
+
+                <div class="interest-filters" id="interestFilters">
+                    <div class="filter-chip active" onclick="filterContent('all')">All</div>
+                    <div class="filter-chip" onclick="filterContent('design')">Design</div>
+                    <div class="filter-chip" onclick="filterContent('tech')">Technology</div>
+                    <div class="filter-chip" onclick="filterContent('art')">Art</div>
+                    <div class="filter-chip" onclick="filterContent('photography')">Photography</div>
+                </div>
+
+                <div class="content-grid" id="contentGrid">
+                    <div class="content-card" data-category="design">
+                        <div class="card-header">
+                            <div class="avatar">AD</div>
+                            <div class="user-info">
+                                <h3>Alex Designer</h3>
+                                <p>2 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="card-image">Design Preview</div>
+                        <div class="card-content">
+                            <p>Just finished this minimal UI design for a meditation app. Clean lines and calming colors to promote focus and relaxation. 🧘‍♀️</p>
+                            <div class="card-tags">
+                                <span class="tag">UI/UX</span>
+                                <span class="tag">Minimal</span>
+                                <span class="tag">Mobile</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn">❤️ 124</button>
+                            <button class="action-btn">💬 23</button>
+                            <button class="action-btn">↗️ Share</button>
+                        </div>
+                    </div>
+
+                    <div class="content-card" data-category="tech">
+                        <div class="card-header">
+                            <div class="avatar">TC</div>
+                            <div class="user-info">
+                                <h3>Tech Critic</h3>
+                                <p>4 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="card-image">Code Screenshot</div>
+                        <div class="card-content">
+                            <p>New JavaScript framework promises 50% faster rendering. Here's my take on whether it's worth the hype and migration effort.</p>
+                            <div class="card-tags">
+                                <span class="tag">JavaScript</span>
+                                <span class="tag">Framework</span>
+                                <span class="tag">Performance</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn">❤️ 89</button>
+                            <button class="action-btn">💬 45</button>
+                            <button class="action-btn">↗️ Share</button>
+                        </div>
+                    </div>
+
+                    <div class="content-card" data-category="art">
+                        <div class="card-header">
+                            <div class="avatar">MA</div>
+                            <div class="user-info">
+                                <h3>Maya Artist</h3>
+                                <p>6 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="card-image">Digital Art</div>
+                        <div class="card-content">
+                            <p>Exploring the intersection of traditional watercolor techniques with digital art. This piece took 15 hours to complete! 🎨</p>
+                            <div class="card-tags">
+                                <span class="tag">Digital Art</span>
+                                <span class="tag">Watercolor</span>
+                                <span class="tag">Process</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn">❤️ 256</button>
+                            <button class="action-btn">💬 67</button>
+                            <button class="action-btn">↗️ Share</button>
+                        </div>
+                    </div>
+
+                    <div class="content-card" data-category="photography">
+                        <div class="card-header">
+                            <div class="avatar">SP</div>
+                            <div class="user-info">
+                                <h3>Street Photographer</h3>
+                                <p>8 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="card-image">Street Photo</div>
+                        <div class="card-content">
+                            <p>Golden hour magic in downtown. Sometimes the best shots happen when you least expect them. Shot on film! 📸</p>
+                            <div class="card-tags">
+                                <span class="tag">Street Photography</span>
+                                <span class="tag">Film</span>
+                                <span class="tag">Golden Hour</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn">❤️ 178</button>
+                            <button class="action-btn">💬 34</button>
+                            <button class="action-btn">↗️ Share</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <div class="nav-item active">
+                        <svg class="nav-icon" viewBox="0 0 24 24">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        </svg>
+                        <span class="nav-label">Home</span>
+                    </div>
+                    <div class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="21 21l-4.35-4.35"/>
+                        </svg>
+                        <span class="nav-label">Discover</span>
+                    </div>
+                    <div class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                        </svg>
+                        <span class="nav-label">Create</span>
+                    </div>
+                    <div class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span class="nav-label">Profile</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explanation Panel -->
+    <div class="overlay" id="overlay" onclick="hideExplanation()"></div>
+    <div class="explanation-panel" id="explanationPanel">
+        <button class="close-btn" onclick="hideExplanation()">×</button>
+        <h2>SocialFlow - Mobile App Redesign</h2>
+        
+        <h3>🎯 Problem Addressed</h3>
+        <p><strong>Instagram's Content Overwhelm:</strong> Users often feel overwhelmed by the endless scroll of mixed content, making it difficult to focus on content that matches their current interests or mood.</p>
+        
+        <h3>💡 Key Improvements</h3>
+        
+        <h3>1. Focus Mode Toggle</h3>
+        <ul>
+            <li><strong>What it does:</strong> Filters content based on user's current interests and engagement patterns</li>
+            <li><strong>Why it helps:</strong> Reduces cognitive load and prevents mindless scrolling</li>
+            <li><strong>How it works:</strong> Uses AI to curate content when activated, shows chronological feed when off</li>
+        </ul>
+        
+        <h3>2. Interest-Based Filtering</h3>
+        <ul>
+            <li><strong>What it does:</strong> Quick filter chips for different content categories</li>
+            <li><strong>Why it helps:</strong> Users can quickly find content matching their current mood or need</li>
+            <li><strong>How it works:</strong> Smart categorization based on hashtags, user behavior, and content analysis</li>
+        </ul>
+        
+        <h3>3. Enhanced Content Cards</h3>
+        <ul>
+            <li><strong>What it does:</strong> Richer preview with tags and better content hierarchy</li>
+            <li><strong>Why it helps:</strong> Users can quickly assess content relevance before engaging</li>
+            <li><strong>How it works:</strong> Structured information display with visual hierarchy</li>
+        </ul>
+        
+        <h3>4. Mindful Interaction Design</h3>
+        <ul>
+            <li><strong>What it does:</strong> Encourages thoughtful engagement over passive consumption</li>
+            <li><strong>Why it helps:</strong> Promotes healthier social media habits</li>
+            <li><strong>How it works:</strong> Prominent quality indicators and meaningful interaction prompts</li>
+        </ul>
+        
+        <h3>📊 Expected Impact</h3>
+        <ul>
+            <li>35% reduction in time spent scrolling</li>
+            <li>50% increase in meaningful content engagement</li>
+            <li>60% improvement in user satisfaction with content relevance</li>
+            <li>40% reduction in app-related anxiety and overwhelm</li>
+        </ul>
+        
+        <h3>🚀 Technical Implementation</h3>
+        <p>Built with modern web technologies, this prototype demonstrates responsive design principles, smooth animations, and intuitive user interactions. The focus mode uses simulated AI content curation, while the filtering system provides instant content organization.</p>
+    </div>
+
+    <script>
+        let focusModeActive = false;
+        let currentFilter = 'all';
+
+        function toggleFocusMode() {
+            const toggle = document.getElementById('focusToggle');
+            const filters = document.getElementById('interestFilters');
+            
+            focusModeActive = !focusModeActive;
+            toggle.classList.toggle('active', focusModeActive);
+            
+            if (focusModeActive) {
+                filters.style.display = 'flex';
+                document.querySelector('.focus-toggle').style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+            } else {
+                filters.style.display = 'none';
+                document.querySelector('.focus-toggle').style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+                showAllContent();
+            }
+        }
+
+        function filterContent(category) {
+            currentFilter = category;
+            
+            // Update active filter chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter content cards
+            const cards = document.querySelectorAll('.content-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeIn 0.3s ease';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function showAllContent() {
+            const cards = document.querySelectorAll('.content-card');
+            cards.forEach(card => {
+                card.style.display = 'block';
+                card.style.animation = 'fadeIn 0.3s ease';
+            });
+            
+            // Reset filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            document.querySelector('.filter-chip').classList.add('active');
+        }
+
+        function showExplanation() {
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('explanationPanel').classList.add('active');
+        }
+
+        function hideExplanation() {
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('explanationPanel').classList.remove('active');
+        }
+
+        // Add smooth scrolling animation for content
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.content-card');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'slideInUp 0.6s ease forwards';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes slideInUp {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
