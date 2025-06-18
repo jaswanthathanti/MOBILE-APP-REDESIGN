@@ -30,3 +30,4 @@ The interactive prototype demonstrates responsive design, smooth animations, and
 
 *OUTPUT*:
 
+![Image](https://github.com/user-attachments/assets/78367a32-b727-4e40-9be1-0aef426e6f40)
